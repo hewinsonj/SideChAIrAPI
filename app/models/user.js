@@ -1,28 +1,53 @@
-const mongoose = require('mongoose')
+// const mongoose = require('mongoose')
+
+// const userSchema = new mongoose.Schema(
+// 	{
+// 		email: {
+// 			type: String,
+// 			required: true,
+// 			unique: true,
+// 		},
+// 		hashedPassword: {
+// 			type: String,
+// 			required: true,
+// 		},
+// 		token: String,
+// 	},
+// 	{
+// 		timestamps: true,
+// 		toObject: {
+// 			// remove `hashedPassword` field when we call `.toObject`
+// 			transform: (_doc, user) => {
+// 				delete user.hashedPassword
+// 				return user
+// 			},
+// 		},
+// 	}
+// )
+
+// module.exports = mongoose.model('User', userSchema)
+
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
-	{
-		email: {
-			type: String,
-			required: true,
-			unique: true,
-		},
-		hashedPassword: {
-			type: String,
-			required: true,
-		},
-		token: String,
-	},
-	{
-		timestamps: true,
-		toObject: {
-			// remove `hashedPassword` field when we call `.toObject`
-			transform: (_doc, user) => {
-				delete user.hashedPassword
-				return user
-			},
-		},
-	}
-)
+  {
+    email: { type: String, required: true, unique: true },
+    hashedPassword: { type: String, required: true },
+    role: { type: String, enum: ["therapist", "patient"], required: true },
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+    },
+  },
+  {
+    timestamps: true,
+    toObject: {
+      transform: (_doc, user) => {
+        delete user.hashedPassword;
+        return user;
+      },
+    },
+  }
+);
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = mongoose.model("User", userSchema);

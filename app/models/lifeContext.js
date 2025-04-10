@@ -6,11 +6,16 @@ const lifeContextSchema = new mongoose.Schema({
     ref: 'Patient',
     required: true
   },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   occupation: String,
   goals: String,
   identityFactors: String,
   relationshipStatus: String,
-  hobbies: String,
+  hobbies: [{ type: String }],
   significantEvents: String,
   livingSituation: String,
   sleepHealth: String,

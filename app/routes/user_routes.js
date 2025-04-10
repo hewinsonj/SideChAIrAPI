@@ -16,6 +16,8 @@ const BadParamsError = errors.BadParamsError
 const BadCredentialsError = errors.BadCredentialsError
 
 const User = require('../models/user')
+const Therapist = require('../models/therapist')
+const Patient = require('../models/patient')
 
 // passing this as a second argument to `router.<verb>` will make it
 // so that a token MUST be passed for that route to be available
@@ -27,36 +29,49 @@ const router = express.Router()
 
 // SIGN UP
 // POST /sign-up
-router.post('/sign-up', (req, res, next) => {
-	// start a promise chain, so that any errors will pass to `handle`
-	Promise.resolve(req.body.credentials)
-		// reject any requests where `credentials.password` is not present, or where
-		// the password is an empty string
-		.then((credentials) => {
-			if (
-				!credentials ||
-				!credentials.password ||
-				credentials.password !== credentials.password_confirmation
-			) {
-				throw new BadParamsError()
-			}
+router.post('/sign-up', async (req, res, next) => {
+	console.log("Sign-Up Request Received:", req.body.credentials)
+	const credentials = req.body.credentials
+
+	if (
+		!credentials ||
+		!credentials.password ||
+		credentials.password !== credentials.password_confirmation
+	) {
+		console.log("Password validation failed.")
+		throw new BadParamsError()
+	}
+
+	try {
+		const hash = await bcrypt.hash(credentials.password, bcryptSaltRounds)
+		const user = await User.create({
+			email: credentials.email,
+			hashedPassword: hash,
+			role: credentials.role || 'patient',
+			organizationId: credentials.organizationId || null
 		})
-		// generate a hash from the provided password, returning a promise
-		.then(() => bcrypt.hash(req.body.credentials.password, bcryptSaltRounds))
-		.then((hash) => {
-			// return necessary params to create a user
-			return {
-				email: req.body.credentials.email,
-				hashedPassword: hash,
-			}
-		})
-		// create user with provided email and hashed password
-		.then((user) => User.create(user))
-		// send the new user object back with status 201, but `hashedPassword`
-		// won't be send because of the `transform` in the User model
-		.then((user) => res.status(201).json({ user: user.toObject() }))
-		// pass any errors along to the error handler
-		.catch(next)
+
+		let profilePromise = Promise.resolve()
+		if (user.role === 'therapist') {
+			profilePromise = Therapist.create({
+				userAccount: user._id,
+				fullName: credentials.fullName || user.email
+			})
+		} else if (user.role === 'patient') {
+			profilePromise = Patient.create({
+				userAccount: user._id,
+				fullName: credentials.fullName || user.email,
+				owner: user._id
+			})
+		}
+
+		await profilePromise
+		console.log("User created:", user.email)
+		res.status(201).json({ user: user.toObject() })
+	} catch (err) {
+		console.log("Signup error:", err)
+		next(err)
+	}
 })
 
 // SIGN IN
@@ -93,8 +108,8 @@ router.post('/sign-in', (req, res, next) => {
 			}
 		})
 		.then((user) => {
-			// return status 201, the email, and the new token
-			res.status(201).json({ user: user.toObject() })
+			// return status 201, the user object, and the new token
+			res.status(201).json({ token: user.token, user: user.toObject() })
 		})
 		.catch(next)
 })
@@ -140,6 +155,20 @@ router.delete('/sign-out', requireToken, (req, res, next) => {
 	req.user
 		.save()
 		.then(() => res.sendStatus(204))
+		.catch(next)
+})
+
+// GET all users - therapist only
+router.get('/users', requireToken, (req, res, next) => {
+	if (req.user.role !== 'therapist') {
+		return res.sendStatus(403)
+	}
+
+	User.find({})
+		.then(users => {
+			const safeUsers = users.map(user => user.toObject())
+			res.status(200).json({ users: safeUsers })
+		})
 		.catch(next)
 })
 

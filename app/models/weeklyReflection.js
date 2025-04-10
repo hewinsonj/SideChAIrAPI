@@ -6,6 +6,11 @@ const weeklyReflectionSchema = new mongoose.Schema({
     ref: 'Patient',
     required: true
   },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   aiSummary: { type: String },
   createdAt: {
     type: Date,

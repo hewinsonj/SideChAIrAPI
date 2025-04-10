@@ -6,6 +6,11 @@ const patientRatingSchema = new mongoose.Schema({
     ref: 'Conversation',
     required: true
   },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   mood: Number,
   stress: Number,
   energy: Number,

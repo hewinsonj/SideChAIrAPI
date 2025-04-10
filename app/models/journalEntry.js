@@ -1,10 +1,15 @@
 const mongoose = require('mongoose');
 const fieldEncryption = require('mongoose-field-encryption').fieldEncryption;
 
-const journalEntrySchema = new mongoose.Schema({
+const journalentrySchema = new mongoose.Schema({
   patientId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Patient',
+    required: true
+  },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
   title: { type: String },
@@ -22,9 +27,9 @@ const journalEntrySchema = new mongoose.Schema({
   }
 });
 
-journalEntrySchema.plugin(fieldEncryption, {
+journalentrySchema.plugin(fieldEncryption, {
   fields: ['content'],
   secret: process.env.ENCRYPTION_SECRET
 });
 
-module.exports = mongoose.model('JournalEntry', journalEntrySchema);
+module.exports = mongoose.model('JournalEntry', journalentrySchema);

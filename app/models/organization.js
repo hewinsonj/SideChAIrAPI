@@ -2,8 +2,13 @@ const mongoose = require('mongoose');
 
 const organizationSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  type: { type: String, enum: ['clinic', 'practice', 'team'], default: 'practice' },
+  type: { type: String, enum: ['clinic', 'practice', 'team', 'private'], default: 'practice' },
   license: String,
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   memberLimit: { type: Number, default: 10 },
   createdAt: { type: Date, default: Date.now }
 }, {
@@ -12,6 +17,13 @@ const organizationSchema = new mongoose.Schema({
       return obj;
     }
   }
+});
+
+organizationSchema.pre('save', function(next) {
+  if (!this.owner) {
+    this.owner = this._id; // Ensure owner is set to the document's ID if not provided
+  }
+  next();
 });
 
 module.exports = mongoose.model('Organization', organizationSchema);

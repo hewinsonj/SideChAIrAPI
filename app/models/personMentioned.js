@@ -6,6 +6,11 @@ const personMentionedSchema = new mongoose.Schema({
     ref: 'Conversation',
     required: true
   },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   name: { type: String, required: true },
   role: { type: String }
 }, {

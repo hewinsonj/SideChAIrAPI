@@ -7,6 +7,11 @@ const sessionNoteSchema = new mongoose.Schema({
     ref: 'Conversation',
     required: true
   },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   content: { type: String, required: true },
   author: {
     type: mongoose.Schema.Types.ObjectId,

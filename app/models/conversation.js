@@ -25,6 +25,15 @@ const conversationSchema = new mongoose.Schema({
   aiScoringId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'AIScoring'
+  },
+  sharedWithTherapists: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   }
 }, {
   timestamps: true,

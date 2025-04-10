@@ -6,6 +6,11 @@ const supportPersonSchema = new mongoose.Schema({
     ref: 'Patient',
     required: true
   },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   name: { type: String, required: true },
   relation: { type: String },
   contact: { type: String },

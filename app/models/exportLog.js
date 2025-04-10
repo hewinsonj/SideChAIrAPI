@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const exportLogSchema = new mongoose.Schema({
-  userId: {
+  owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true

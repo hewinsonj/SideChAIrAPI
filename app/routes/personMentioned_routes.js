@@ -25,6 +25,29 @@ router.get('/:id', requireToken, (req, res) => {
 router.post('/', requireToken, (req, res) => {
   req.body.personMentioned.owner = req.user._id
   PersonMentioned.create(req.body.personMentioned)
+    .then((person) => {
+      const { firstname, lastname, patientId } = req.body.personMentioned
+      PersonMentioned.countDocuments({ firstname, lastname, patientId })
+        .then((count) => {
+          if (count > 2) {
+            const SignificantPerson = require('../models/significantPerson')
+            return SignificantPerson.findOneAndUpdate(
+              { firstname, lastname, patientId },
+              {
+                $setOnInsert: {
+                  firstname,
+                  lastname,
+                  patientId,
+                  relation: 'auto-detected',
+                  supportPerson: false
+                }
+              },
+              { upsert: true, new: true }
+            )
+          }
+        })
+      return person
+    })
     .then((person) => res.status(201).json({ person }))
     .catch((err) => handle(err, res))
 })

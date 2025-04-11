@@ -7,10 +7,12 @@ const requireTherapistAccess = require('../../lib/requireTherapistAccess')
 const AccessLog = require('../models/accessLog')
 
 const Conversation = require('../models/conversation')
+const PersonMentioned = require('../models/personMentioned')
+const SignificantPerson = require('../models/significantPerson')
 
 // INDEX - OWNERS conversations
 router.get('/', requireToken, (req, res) => {
-  Conversation.find({ owner: req.user._id })
+  Conversation.find({ patientId: req.user._id })
     .then((conversations) => res.status(200).json({ conversations }))
     .catch((err) => handle(err, res))
 })
@@ -41,9 +43,61 @@ router.get('/:id', requireToken, (req, res) => {
 
 // CREATE - New conversation
 router.post('/', requireToken, requireTherapistAccess, (req, res) => {
-  req.body.conversation.owner = req.user._id
+  req.body.conversation.patientId = req.user._id
   Conversation.create(req.body.conversation)
-    .then((conversation) => res.status(201).json({ conversation }))
+    .then(async (conversation) => {
+      if (req.body.conversation.personMentions) {
+        const mentions = req.body.conversation.personMentions
+
+        mentions.forEach(async (mention) => {
+          const existingInSameConvo = await PersonMentioned.findOne({
+            conversationId: conversation._id,
+            patientId: conversation.patientId,
+            firstName: mention.firstName,
+            lastName: mention.lastName
+          })
+
+          if (existingInSameConvo) return // Skip duplicate in same convo
+
+          const existingAcrossConvos = await PersonMentioned.findOneAndUpdate(
+            {
+              patientId: conversation.patientId,
+              firstName: mention.firstName,
+              lastName: mention.lastName,
+              conversationId: { $ne: conversation._id }
+            },
+            { $inc: { mentionCount: 1 } },
+            { new: true }
+          )
+
+          if (existingAcrossConvos && existingAcrossConvos.mentionCount >= 2) {
+            const sigExists = await SignificantPerson.findOne({
+              patientId: conversation.patientId,
+              firstName: mention.firstName,
+              lastName: mention.lastName
+            })
+
+            if (!sigExists) {
+              await SignificantPerson.create({
+                patientId: conversation.patientId,
+                firstName: mention.firstName,
+                lastName: mention.lastName
+              })
+            }
+          } else {
+            await PersonMentioned.create({
+              conversationId: conversation._id,
+              patientId: conversation.patientId,
+              firstName: mention.firstName,
+              lastName: mention.lastName,
+              context: mention.context || '',
+              mentionCount: 1
+            })
+          }
+        })
+      }
+      res.status(201).json({ conversation })
+    })
     .catch((err) => handle(err, res))
 })
 

@@ -15,7 +15,7 @@ const TherapistRating = require('./app/models/therapistRating')
 const PatientRating = require('./app/models/patientRating')
 const SessionNote = require('./app/models/sessionNote')
 const LifeContext = require('./app/models/lifeContext')
-const SupportPerson = require('./app/models/supportPerson')
+const SignificantPerson = require('./app/models/significantPerson')
 const AISummary = require('./app/models/aiSummary')
 const AIScoring = require('./app/models/aiScoring')
 const AITheme = require('./app/models/aiTheme')
@@ -171,26 +171,27 @@ await LifeContext.create({
   owner: user2._id
 });
 
-await SupportPerson.create({
-  patientId: patientUserB._id, 
-  name: 'Mark', 
-  relation: 'Friend', 
+await SignificantPerson.create({
+  patientId: patientUserB._id,
+  firstName: 'Mark',
+  lastName: 'Taylor',
+  relation: 'Friend',
+  supportPerson: true,
+  dateMet: '2019-08-01',
   contact: 'mark@email.com',
-  owner: user2._id
+  notes: 'Reliable emotional support.'
 });
 
-// Extend Emily's support log
-await SupportPerson.updateOne(
-  { patientId: patientUserB._id, name: 'Emily' },
-  {
-    $set: {
-      notes: 'Very involved in patient’s care.',
-      interactions: [
-        { type: 'call', date: new Date(), summary: 'Called to check in on medication.' },
-        { type: 'visit', date: new Date(), summary: 'Attended therapy session as support.' }
-      ]
-    }
-  })
+await SignificantPerson.create({
+  patientId: patientUserA._id,
+  firstName: 'Emily',
+  lastName: 'Doe',
+  relation: 'Sister',
+  supportPerson: true,
+  dateMet: '1990-05-01',
+  contact: 'emily@email.com',
+  notes: 'Very involved in patient’s care.'
+});
 
 await AISummary.create({ conversationId: convoB1._id, text: 'Focused on interpersonal growth.', model: 'gpt-4', owner: user2._id });
 await AISummary.create({ conversationId: convoB2._id, text: 'Observed improvement in tone.', model: 'claude-v1', owner: user2._id });
@@ -211,9 +212,30 @@ await Keyword.insertMany([
 ]);
 
 await PersonMentioned.insertMany([
-  { conversationId: convoB1._id, name: 'Samantha', role: 'partner', owner: user2._id  },
-  { conversationId: convoB2._id, name: 'Lisa', role: 'mentor', owner: user2._id },
-  { conversationId: convoB2._id, name: 'Kevin', role: 'bully', owner: user2._id }
+  {
+    conversationId: convoB1._id,
+    patientId: patientUserB._id,
+    firstName: 'Samantha',
+    lastName: 'Lee',
+    context: 'Mentioned as source of stress in relationship',
+    mentionCount: 1
+  },
+  {
+    conversationId: convoB2._id,
+    patientId: patientUserB._id,
+    firstName: 'Lisa',
+    lastName: 'Johnson',
+    context: 'Helped prep for interview',
+    mentionCount: 2
+  },
+  {
+    conversationId: convoB2._id,
+    patientId: patientUserB._id,
+    firstName: 'Kevin',
+    lastName: 'Smith',
+    context: 'Described as a bully from school',
+    mentionCount: 1
+  }
 ]);
 
 await WeeklyReflection.create({
@@ -394,12 +416,15 @@ await LifeContext.create({
   owner: user1._id
 })
 
-await SupportPerson.create({
-  patientId: patientUserA._id, 
-  name: 'Emily', 
-  relation: 'Sister', 
+await SignificantPerson.create({
+  patientId: patientUserA._id,
+  firstName: 'Emily',
+  lastName: 'Doe',
+  relation: 'Sister',
+  supportPerson: true,
+  dateMet: '1990-05-01',
   contact: 'emily@email.com',
-  owner: user1._id
+  notes: 'Very involved in patient’s care.'
 });
 
 await AISummary.create({ conversationId: convoA1._id, text: 'Discussed anxiety and triggers.', model: 'gpt-3.5', owner: user1._id })
@@ -415,12 +440,16 @@ await Keyword.create({
   owner: user1._id  // Link owner to user1 (therapist)
 });
 
-await PersonMentioned.create({
-  conversationId: convoA1._id,
-  name: 'John',
-  role: 'boss',
-  owner: user1._id  // Link owner to user1 (therapist)
-});
+await PersonMentioned.insertMany([
+  {
+    conversationId: convoA1._id,
+    patientId: patientUserA._id,
+    firstName: 'John',
+    lastName: 'Davis',
+    context: 'Boss causing performance stress',
+    mentionCount: 1
+  }
+]);
 
 await WeeklyReflection.create({
   patient: patientUserA._id,

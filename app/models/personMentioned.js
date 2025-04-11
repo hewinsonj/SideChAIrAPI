@@ -6,13 +6,15 @@ const personMentionedSchema = new mongoose.Schema({
     ref: 'Conversation',
     required: true
   },
-  owner: {
+  patientId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Patient',
     required: true
   },
-  name: { type: String, required: true },
-  role: { type: String }
+  firstName: { type: String, required: true },
+  lastName: { type: String },
+  context: { type: String },
+  mentionCount: { type: Number }
 }, {
   timestamps: true,
   toObject: {

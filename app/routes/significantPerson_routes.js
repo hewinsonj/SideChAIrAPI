@@ -4,18 +4,18 @@ const handle = require('../../lib/handle')
 const requireToken = require('../../lib/requireToken')
 const requireOwnership = require('../../lib/requireOwnership')
 
-const SupportPerson = require('../models/supportPerson')
+const SignificantPerson = require('../models/significantPerson')
 
 // INDEX
 router.get('/', requireToken, (req, res) => {
-  SupportPerson.find({ owner: req.user._id })
+  SignificantPerson.find({ patientId: req.user._id })
     .then((people) => res.status(200).json({ people }))
     .catch((err) => handle(err, res))
 })
 
 // SHOW
 router.get('/:id', requireToken, (req, res) => {
-  SupportPerson.findById(req.params.id)
+  SignificantPerson.findById(req.params.id)
     .then(requireOwnership(req))
     .then((person) => res.status(200).json({ person }))
     .catch((err) => handle(err, res))
@@ -23,18 +23,17 @@ router.get('/:id', requireToken, (req, res) => {
 
 // CREATE
 router.post('/', requireToken, (req, res) => {
-  req.body.supportPerson.owner = req.user._id
-  SupportPerson.create(req.body.supportPerson)
+  SignificantPerson.create(req.body.significantPerson)
     .then((person) => res.status(201).json({ person }))
     .catch((err) => handle(err, res))
 })
 
 // UPDATE
 router.patch('/:id', requireToken, (req, res) => {
-  SupportPerson.findById(req.params.id)
+  SignificantPerson.findById(req.params.id)
     .then(requireOwnership(req))
     .then((person) => {
-      Object.assign(person, req.body.supportPerson)
+      Object.assign(person, req.body.significantPerson)
       return person.save()
     })
     .then((person) => res.status(200).json({ person }))
@@ -43,7 +42,7 @@ router.patch('/:id', requireToken, (req, res) => {
 
 // DELETE
 router.delete('/:id', requireToken, (req, res) => {
-  SupportPerson.findById(req.params.id)
+  SignificantPerson.findById(req.params.id)
     .then(requireOwnership(req))
     .then((person) => {
       return person.deleteOne()

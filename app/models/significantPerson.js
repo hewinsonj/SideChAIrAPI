@@ -1,18 +1,16 @@
 const mongoose = require('mongoose');
 
-const supportPersonSchema = new mongoose.Schema({
+const significantPersonSchema = new mongoose.Schema({
   patientId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Patient',
     required: true
   },
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  name: { type: String, required: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String },
   relation: { type: String },
+  supportPerson: { type: Boolean, default: false },
+  dateMet: { type: String },
   contact: { type: String },
   notes: { type: String }
 }, {
@@ -24,4 +22,4 @@ const supportPersonSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('SupportPerson', supportPersonSchema);
+module.exports = mongoose.model('SignificantPerson', significantPersonSchema);

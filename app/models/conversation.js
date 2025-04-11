@@ -7,7 +7,11 @@ const conversationSchema = new mongoose.Schema({
     ref: 'Patient',
     required: true
   },
-  transcript: { type: String, required: true },
+  therapist: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   audioUrl: { type: String },
   date: { type: Date, default: Date.now },
   therapistRatingId: {
@@ -34,19 +38,30 @@ const conversationSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
-  }
+  },
+  messages: [{
+    speaker: { type: String, enum: ['therapist', 'patient'], required: true },
+    content: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now }
+  }],
+  lifeEvents: [{
+    title: { type: String, required: true },
+    description: String,
+    category: {
+      type: String,
+      enum: ['diet', 'medication', 'fitness', 'sleep', 'work', 'family', 'relationships', 'social', 'housing', 'finance', 'school', 'legal', 'spirituality', 'self-image', 'trauma', 'health', 'other'],
+      default: 'other'
+    },
+    importance: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
+    relatedMessageIndex: Number,
+    flaggedAt: { type: Date, default: Date.now }
+  }]
 }, {
-  timestamps: true,
-  toObject: {
-    transform: (_doc, obj) => {
-      delete obj.transcript;
-      return obj;
-    }
-  }
+  timestamps: true
 });
 
 conversationSchema.plugin(fieldEncryption, {
-  fields: ['transcript'],
+  fields: ['messages'],
   secret: process.env.ENCRYPTION_SECRET
 });
 

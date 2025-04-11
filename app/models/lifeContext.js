@@ -31,7 +31,20 @@ const lifeContextSchema = new mongoose.Schema({
         ref: 'User'
       }
     }
-  ]
+  ],
+  // LIFE EVENTS WILL BE HOW WE DOCUMENT MEDICATION CHANGES
+  lifeEvents: [{
+    title: { type: String, required: true },
+    description: String,
+    category: {
+      type: String,
+      enum: ['diet', 'medication', 'fitness', 'sleep', 'work', 'family', 'relationships', 'social', 'housing', 'finance', 'school', 'legal', 'spirituality', 'self-image', 'trauma', 'health', 'other'],
+      default: 'other'
+    },
+    importance: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
+    relatedMessageIndex: Number,
+    flaggedAt: { type: Date, default: Date.now }
+  }]
 }, {
   timestamps: true,
   toObject: {
@@ -42,3 +55,4 @@ const lifeContextSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('LifeContext', lifeContextSchema);
+

@@ -12,7 +12,7 @@ const aiThemeRoutes = require("./app/routes/aiTheme_routes");
 const conversationRoutes = require("./app/routes/conversation_routes");
 const exportLogRoutes = require("./app/routes/exportLog_routes");
 const flaggedSessionRoutes = require("./app/routes/flaggedSession_routes");
-const journalentryRoutes = require("./app/routes/journalentry_routes");
+const journalEntryRoutes = require("./app/routes/journalEntry_routes");
 const keywordRoutes = require("./app/routes/keyword_routes");
 const lifeContextRoutes = require("./app/routes/lifeContext_routes");
 const organizationRoutes = require("./app/routes/organization_routes");
@@ -22,6 +22,7 @@ const personMentionedRoutes = require("./app/routes/personMentioned_routes");
 const sessionNoteRoutes = require("./app/routes/sessionNote_routes");
 const supportPersonRoutes = require("./app/routes/supportPerson_routes");
 const therapistRatingRoutes = require("./app/routes/therapistRating_routes");
+const treatmentRecordRoutes = require("./app/routes/treatmentRecord_routes");
 const weeklyReflectionRoutes = require("./app/routes/weeklyReflection_routes");
 const therapistRoutes = require("./app/routes/therapist_routes");
 
@@ -82,24 +83,26 @@ app.use(requestLogger);
 
 // register route files
 app.use(userRoutes);
-app.use('/ai-scorings', aiScoringRoutes);
-app.use('/ai-summaries', aiSummaryRoutes);
-app.use('/ai-themes', aiThemeRoutes);
-app.use('/conversations', conversationRoutes);
-app.use('/export-logs', exportLogRoutes);
-app.use('/flagged-sessions', flaggedSessionRoutes);
-app.use('/journal-entries', journalentryRoutes);
-app.use('/keywords', keywordRoutes);
-app.use('/life-contexts', lifeContextRoutes);
-app.use('/organizations', organizationRoutes);
-app.use('/patients', patientRoutes);
-app.use('/patient-ratings', patientRatingRoutes);
-app.use('/people-mentioned', personMentionedRoutes);
-app.use('/session-notes', sessionNoteRoutes);
-app.use('/support-people', supportPersonRoutes);
-app.use('/therapist-ratings', therapistRatingRoutes);
-app.use('/weekly-reflections', weeklyReflectionRoutes);
-app.use('/therapists', therapistRoutes);
+app.use("/ai-scorings", aiScoringRoutes);
+app.use("/ai-summaries", aiSummaryRoutes);
+app.use("/ai-themes", aiThemeRoutes);
+app.use("/conversations", conversationRoutes);
+app.use("/export-logs", exportLogRoutes);
+app.use("/flagged-sessions", flaggedSessionRoutes);
+app.use("/journal-entries", journalEntryRoutes);
+app.use("/keywords", keywordRoutes);
+app.use("/life-contexts", lifeContextRoutes);
+app.use("/organizations", organizationRoutes);
+app.use("/patients", patientRoutes);
+app.use("/patient-ratings", patientRatingRoutes);
+app.use("/people-mentioned", personMentionedRoutes);
+app.use("/session-notes", sessionNoteRoutes);
+app.use("/support-people", supportPersonRoutes);
+app.use("/therapist-ratings", therapistRatingRoutes);
+app.use("/weekly-reflections", weeklyReflectionRoutes);
+app.use("/therapists", therapistRoutes);
+app.use("/treatment-records", treatmentRecordRoutes);
+
 console.log("ALL ROUTES LOADED");
 
 // register error handling middleware
@@ -112,10 +115,10 @@ app.listen(port, () => {
   console.log("listening on port " + port);
 });
 
-app.get('/__journalentry-direct', (req, res) => {
-  console.log('🔥 DIRECT ROUTE HIT 🔥')
-  res.json({ message: 'direct test' })
-})
+app.get("/__journalentry-direct", (req, res) => {
+  console.log("🔥 DIRECT ROUTE HIT 🔥");
+  res.json({ message: "direct test" });
+});
 
 // needed for testing
 module.exports = app;

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const organizationSchema = new mongoose.Schema({
+// ORGANIZATION CAN BE USED AS A PLACE OF WORK FOR PATIENTS AND THERAPISTS
   name: { type: String, required: true },
   type: { type: String, enum: ['clinic', 'practice', 'team', 'private'], default: 'practice' },
   license: String,

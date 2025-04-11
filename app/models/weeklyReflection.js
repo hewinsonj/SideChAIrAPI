@@ -6,7 +6,12 @@ const weeklyReflectionSchema = new mongoose.Schema({
     ref: 'Patient',
     required: true
   },
-  owner: {
+  therapist: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  patient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
